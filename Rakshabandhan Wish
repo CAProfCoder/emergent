@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>State Bank of India - Secure Reward Portal</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --sbi-blue: #280071;
+      --sbi-light-blue: #00a5df;
+      --sbi-bg: #f4f6f9;
+      --text-dark: #212529;
+      --gpay-dark: #1e1e1e;
+      --gpay-red: #d93025;
+      --gpay-card: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--sbi-bg);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* SBI Header */
+    .sbi-header {
+      background: linear-gradient(90deg, #1b0254 0%, #280071 100%);
+      padding: 12px 20px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .sbi-logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sbi-symbol {
+      width: 28px;
+      height: 28px;
+      background-color: #00a5df;
+      border-radius: 50%;
+      position: relative;
+    }
+
+    .sbi-symbol::after {
+      content: '';
+      position: absolute;
+      width: 8px;
+      height: 14px;
+      background-color: #1b0254;
+      bottom: 0;
+      left: 10px;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+    }
+
+    .sbi-logo-text {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .sbi-subtext {
+      font-size: 0.65rem;
+      color: #9fd7f9;
+      display: block;
+    }
+
+    .secure-badge {
+      font-size: 0.75rem;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Main Container */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .app-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 440px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      border-top: 4px solid var(--sbi-light-blue);
+    }
+
+    .screen {
+      display: none;
+      padding: 24px;
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Step 1: Form Elements */
+    .form-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--sbi-blue);
+      margin-bottom: 4px;
+    }
+
+    .form-desc {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      margin-bottom: 18px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+    }
+
+    .input-group input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-group input[type="text"]:focus {
+      border-color: var(--sbi-light-blue);
+    }
+
+    .radio-card-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .radio-option {
+      position: relative;
+    }
+
+    .radio-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .radio-box {
+      border: 1.5px solid #ced4da;
+      padding: 12px 10px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #fafafa;
+    }
+
+    .radio-option input[type="radio"]:checked + .radio-box {
+      border-color: var(--sbi-blue);
+      background-color: #f0f4ff;
+      color: var(--sbi-blue);
+      font-weight: 600;
+    }
+
+    .sbi-btn {
+      width: 100%;
+      background: var(--sbi-blue);
+      color: white;
+      border: none;
+      padding: 13px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+
+    .sbi-btn:hover {
+      background: #1e0054;
+    }
+
+    /* Step 2: GPay Debit Screen */
+    .gpay-wrapper {
+      text-align: center;
+    }
+
+    .gpay-header-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #5f6368;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .gif-container {
+      width: 100%;
+      height: 140px;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      background-color: #eee;
+    }
+
+    .gif-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .debit-alert-box {
+      background: #fff5f5;
+      border: 1px dashed var(--gpay-red);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .debit-title {
+      font-size: 0.9rem;
+      color: #5f6368;
+      font-weight: 500;
+    }
+
+    .debit-amount {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: var(--gpay-red);
+      margin: 4px 0 8px 0;
+    }
+
+    .debit-details {
+      font-size: 0.8rem;
+      color: #3c4043;
+      line-height: 1.5;
+      border-top: 1px solid #ffe0e0;
+      padding-top: 8px;
+    }
+
+    .gpay-btn {
+      background: #1a73e8;
+      color: #ffffff;
+      border: none;
+      width: 100%;
+      padding: 13px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .gpay-btn:hover {
+      background: #1557b0;
+    }
+
+    /* Step 3: Rakshabandhan Message Screen */
+    .wish-screen {
+      text-align: center;
+    }
+
+    .rakhi-badge {
+      display: inline-block;
+      background: #fef08a;
+      color: #854d0e;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+    }
+
+    .wish-title {
+      font-size: 1.35rem;
+      color: var(--sbi-blue);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .wish-card {
+      background: #fdfbf7;
+      border: 1px solid #fde68a;
+      border-radius: 10px;
+      padding: 18px;
+      margin-bottom: 18px;
+      text-align: left;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: #334155;
+    }
+
+    .wish-salutation {
+      font-weight: 700;
+      color: var(--sbi-blue);
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+
+    .signature {
+      text-align: right;
+      font-weight: 600;
+      color: var(--sbi-blue);
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+
+    .footer-text {
+      text-align: center;
+      font-size: 0.7rem;
+      color: #8c8c8c;
+      padding: 12px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SBI Style Header -->
+  <header class="sbi-header">
+    <div class="sbi-logo-container">
+      <div class="sbi-symbol"></div>
+      <div>
+        <div class="sbi-logo-text">STATE BANK OF INDIA</div>
+        <span class="sbi-subtext">Online Reward & Portal Verification</span>
+      </div>
+    </div>
+    <div class="secure-badge">🔒 256-Bit SSL</div>
+  </header>
+
+  <!-- Content Body -->
+  <main class="main-wrapper">
+    <div class="app-card">
+
+      <!-- SCREEN 1: Input Details -->
+      <section class="screen active" id="screen-1">
+        <h2 class="form-title">Claim Festive Gift Credit</h2>
+        <p class="form-desc">Lucky ke taraf se special gift receive karne ke liye verify karein.</p>
+
+        <form id="claimForm">
+          <div class="input-group">
+            <label for="userName">Enter Your Name</label>
+            <input type="text" id="userName" placeholder="Apna pura naam daalein" required />
+          </div>
+
+          <div class="input-group">
+            <label>Aap Lucky ki kya lagti hain?</label>
+            <div class="radio-card-group">
+              <label class="radio-option">
+                <input type="radio" name="relation" value="badi" required />
+                <div class="radio-box">Badi Behen 👑</div>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="relation" value="choti" required />
+                <div class="radio-box">Choti Behen 🌸</div>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="sbi-btn">Lucky ke taraf se gift lene ke liye submit kare</button>
+        </form>
+      </section>
+
+      <!-- SCREEN 2: GPay Debit Prank -->
+      <section class="screen" id="screen-2">
+        <div class="gpay-wrapper">
+          <div class="gpay-header-tag">Google Pay Transaction Alert</div>
+
+          <div class="gif-container">
+            <img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHY5aWpscjNmN3psZmtuNDJ1bjV6NG03ZXN4ZWltNGp3eGg0bXlsMSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7527pa7qs9kCG78A/giphy.gif" alt="Surprise Celebration" />
+          </div>
+
+          <div class="debit-alert-box">
+            <div class="debit-title">Congratulations! Payment Debited</div>
+            <div class="debit-amount">₹5,000.00</div>
+            <div class="debit-details">
+              <strong>Status:</strong> Successful<br/>
+              <strong>Debited to:</strong> Rohit Ajay Jha<br/>
+              <strong>UPI Ref ID:</strong> SBIN00892371940<br/>
+              <span style="color:#d93025; font-size:0.75rem;">Account se balance successfully deduct ho chuka hai! 😉</span>
+            </div>
+          </div>
+
+          <button class="gpay-btn" id="continueBtn">Aage badhne ke liye continue kare</button>
+        </div>
+      </section>
+
+      <!-- SCREEN 3: Rakshabandhan Greeting -->
+      <section class="screen" id="screen-3">
+        <div class="wish-screen">
+          <span class="rakhi-badge">✨ Happy Rakshabandhan ✨</span>
+          <h2 class="wish-title">Prank Complete! 🎉</h2>
+
+          <div class="wish-card">
+            <div class="wish-salutation" id="customSalutation">Dear Behen,</div>
+            <p id="customMessageBody"></p>
+            <div class="signature">— Aapka Lucky (Rohit) 💙</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer-text">
+    State Bank of India Security Gateway © 2026. All rights reserved.
+  </footer>
+
+  <script>
+    let sisterName = "";
+    let sisterType = "";
+
+    const form = document.getElementById("claimForm");
+    const screen1 = document.getElementById("screen-1");
+    const screen2 = document.getElementById("screen-2");
+    const screen3 = document.getElementById("screen-3");
+    const continueBtn = document.getElementById("continueBtn");
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      sisterName = document.getElementById("userName").value.trim();
+      sisterType = document.querySelector('input[name="relation"]:checked').value;
+
+      screen1.classList.remove("active");
+      screen2.classList.add("active");
+
+      // Soft vibration on mobile devices
+      if (navigator.vibrate) {
+        navigator.vibrate([100, 50, 100]);
+      }
+    });
+
+    continueBtn.addEventListener("click", function () {
+      screen2.classList.remove("active");
+      screen3.classList.add("active");
+
+      const salutationEl = document.getElementById("customSalutation");
+      const messageBodyEl = document.getElementById("customMessageBody");
+
+      if (sisterType === "badi") {
+        salutationEl.innerHTML = `Pyaari Didi (${sisterName}), Sadar Pranam 🙏`;
+        messageBodyEl.innerHTML = `
+          Pehle toh ₹5,000 deduct hone ke liye dher saari badhai! 😜<br/><br/>
+          Aapko <strong>Rakshabandhan ki dher saari shubhkaamnayein</strong>! Aap hamesha aise hi muskurate raho aur har saal mujhe pyari-pyari rakhi baandhte raho. Lucky ke taraf se dher saara pyaar aur respect.<br/><br/>
+          <strong>Aapka bhai aapke liye har mod par hamesha khada rahega!</strong> ✨
+        `;
+      } else {
+        salutationEl.innerHTML = `Oye Choti (${sisterName})! 🌸`;
+        messageBodyEl.innerHTML = `
+          Account check mat karne lagna, ₹5,000 seedha mere account mein credit ho gaye hain party ke liye! 😝<br/><br/>
+          <strong>Happy Rakshabandhan!</strong> Tu aise hi hasti-muskurati reh aur mujhe best rakhi baandhti reh. Lucky ke taraf se tere liye dher saara pyaar aur aashirwaad.<br/><br/>
+          Pareshan chahe jitna bhi karu, <strong>tera bhai tere liye hamesha har pal khada rahega!</strong> 💙
+        `;
+      }
+
+      // Trigger Confetti effect
+      confetti({
+        particleCount: 120,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    });
+  </script>
+</body>
+</html>
